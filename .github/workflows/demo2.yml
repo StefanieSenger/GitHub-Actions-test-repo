@@ -1,0 +1,59 @@
+# .github/workflows/demo2.yml
+
+name: Github Action Template 
+
+on:
+  # specifies multiple (3) trigger events
+
+  pull_request:
+    branches: [ "main" ]
+
+  schedule:
+    # at minute 30, at hours 5 and 17 (i.e., 5:30 AM and 5:30 PM),
+    # * * *, every day of the month, every month, every day of the week
+    - cron:  '30 5,17 * * *'
+
+  workflow_call:
+  # when another workflow calls this workflow, like this: `uses: owner/repo/.github/workflows/demo2.yml@ref`, 
+  # it can pass inputs
+    inputs:
+      username: # in this case, `input.username` is not used anywhere in this workflow, it's just a placeholder example
+        description: 'A username passed from the caller workflow'
+        default: 'john-doe'
+        required: false
+        type: string
+
+  # this is not an event, it modifies how much access the workflow will have when it does run
+  permissions:
+    # the workflow-runs automatically get a GITHUB_TOKEN, here we set the permissions
+    actions: read # permission to interact with GitHub Actions itself, e.g., trigger workflows, cancel jobs
+    contents: write # permission to read/write repository contents, like cloning, committing, pushing, etc.
+    pull-requests: write # permission to modify pull requests
+    issues : read # permission to read issues
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  # This workflow contains a single job called "build"
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+
+    steps:
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+        # `if` prevents a step to run unless a condition is met
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'unassigned' }}
+        shell: zsh
+        name: NPM Install Package
+        run: npm install # command run on the zsh shell of the runner
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          first_name: Github
+          last_name: Action
+          args: The ${{ github.event_name }} event triggered this step.
+          entrypoint: /bin/echo
