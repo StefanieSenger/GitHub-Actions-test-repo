@@ -18,6 +18,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # note: "uses" is a keyword used in a step to indicate that this step runs an
+      # action published elsewhere (GitHub Marketplace in this case); "checkout" is an
+      # action, "@v4" the version; what it does: clones my repository into the file
+      # system of the runner
       - uses: actions/checkout@v4
 
       # Runs a single command using the runners shell
