@@ -29,6 +29,7 @@ jobs:
       - name: install environment and run test suite
         run: |
           conda create --name conda_environment
+          conda init
           conda activate conda_environment
           conda install pytest
           pytest tests/test_file.py
