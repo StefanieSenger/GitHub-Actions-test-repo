@@ -20,7 +20,7 @@ jobs:
 
       # step is not necessary for the artifacts, but just to show that it runs
       - name: print date
-        run: echo "Current date and time: $(date)"
+        run: echo "Current date and time $(date)"
 
       - name: save date
         run: date +"%H:%M:%S" > timestamp.txt
@@ -39,7 +39,8 @@ jobs:
           path: timestamp.txt
 
       - name: upload artifact for weekday if available
-        if: hashFiles('weekday.txt') != '' # this checks if file exists
+        # the if checks if file exists:
+        if: hashFiles('weekday.txt') != ''
         uses: actions/upload-artifact@v4
         with:
           name: weekday
