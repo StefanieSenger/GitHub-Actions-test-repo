@@ -6,7 +6,7 @@ on:
   # specifies multiple (3) trigger events
 
   pull_request:
-    branches: [ "main", "demo_testing" ]
+    branches: [ "demo_testing" ]
 
   schedule:
     # at minute 30, at hours 5 and 17 (i.e., 5:30 AM and 5:30 PM),

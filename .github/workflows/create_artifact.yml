@@ -1,8 +1,9 @@
 # .github/workflows/demo.yml
 
 name: create_artifact
-# This workflow, saves the current date into a file so it can be downloaded as an
-# artifact from the actions tab
+# This workflow saves the current date into a file and the weekday into another file on
+# the condition on which weekday it is and uploads both files as artifacts if they
+# exist. These files can then be downloaded in the actions tab.
 
 on:
   push:
@@ -17,14 +18,29 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
 
-      - name: print date #not necessary for the artefact, but just to show that it runs
-        run: echo Current date and time: $(date)
+      # step is not necessary for the artifacts, but just to show that it runs
+      - name: print date
+        run: echo "Current date and time: $(date)"
 
       - name: save date
-        run: Current date and time: $(date) >> timestamp.txt
+        run: date +"%H:%M:%S" > timestamp.txt
 
-      - name: upload artifact
-        uses: actions/upload-artifact
+      - name: save weekday on condition
+        run: |
+          WEEKDAY=$(date +%A)
+          if [[ "$WEEKDAY" != "Saturday" && "$WEEKDAY" != "Sunday" ]]; then
+            echo "$WEEKDAY" > weekday.txt
+          fi
+
+      - name: upload artifact for date
+        uses: actions/upload-artifact@v4
         with:
           name: timestamp
           path: timestamp.txt
+
+      - name: upload artifact for weekday if available
+        if: hashFiles('weekday.txt') != '' # this checks if file exists
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekday
+          path: weekday.txt
