@@ -1,4 +1,4 @@
-name: python_version
+name: setup and run test suite
 # This workflow installs a specific python version in the runner, installs conda and
 # pytest and runs the extensive test suite.
 
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  check_python_version:
+  setup_and_run_test_suite:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,8 +28,5 @@ jobs:
 
       - name: install environment and run test suite
         run: |
-          conda create --name conda_environment
-          conda init
-          conda activate conda_environment
-          conda install pytest
-          pytest tests/test_file.py
+          conda create --yes --name conda_environment pytest
+          conda run --name conda_environment pytest tests/test_file.py
