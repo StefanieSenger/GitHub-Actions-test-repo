@@ -48,18 +48,18 @@ jobs:
       # that it is only for demonstration, not something you can actually run
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-        # `if` prevents a step to run unless a condition is met
-        if: ${{ github.event_name == 'pull_request' && github.event.action == 'unassigned' }}
-        shell: zsh
-        name: NPM Install Package
-        run: npm install # command run on the zsh shell of the runner
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          first_name: Github
-          last_name: Action
-          args: The ${{ github.event_name }} event triggered this step.
-          entrypoint: /bin/echo
+      # - uses: actions/checkout@v4
+      #   # `if` prevents a step to run unless a condition is met
+      #   if: ${{ github.event_name == 'pull_request' && github.event.action == 'unassigned' }}
+      #   shell: zsh
+      #   name: NPM Install Package
+      #   run: npm install # command run on the zsh shell of the runner
+      #   with:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     first_name: Github
+      #     last_name: Action
+      #     args: The ${{ github.event_name }} event triggered this step.
+      #     entrypoint: /bin/echo
 
       - name: Checkout repository
         uses: actions/checkout@v4

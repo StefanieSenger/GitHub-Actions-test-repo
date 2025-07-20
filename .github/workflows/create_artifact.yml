@@ -1,4 +1,4 @@
-# .github/workflows/demo.yml
+# .github/workflows/create_artifact.yml
 
 name: create_artifact
 # This workflow saves the current date into a file and the weekday into another file on
