@@ -24,7 +24,7 @@ jobs:
         run: python --version
 
       - name: set up conda
-        uses: conda-incubator/setup-miniconda
+        uses: conda-incubator/setup-miniconda@v3
 
       - name: install environment and run test suite
         run: |
