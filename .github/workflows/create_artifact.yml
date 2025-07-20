@@ -1,0 +1,30 @@
+# .github/workflows/demo.yml
+
+name: create_artifact
+# This workflow, saves the current date into a file so it can be downloaded as an
+# artifact from the actions tab
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  print_date:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: print date #not necessary for the artefact, but just to show that it runs
+        run: echo Current date and time: $(date)
+
+      - name: save date
+        run: Current date and time: $(date) >> timestamp.txt
+
+      - name: upload artifact
+        uses: actions/upload-artifact
+        with:
+          name: timestamp
+          path: timestamp.txt

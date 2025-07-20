@@ -24,14 +24,12 @@ on:
         required: false
         type: string
 
-  # this is not an event, it modifies how much access the workflow will have when it does run;
-  # when I run it, I get "permissions` is not a valid event name", so it seems that is wrong
-  permissions:
-    # the workflow-runs automatically get a GITHUB_TOKEN, here we set the permissions
-    actions: read # permission to interact with GitHub Actions itself, e.g., trigger workflows, cancel jobs
-    contents: write # permission to read/write repository contents, like cloning, committing, pushing, etc.
-    pull-requests: write # permission to modify pull requests
-    issues : read # permission to read issues
+permissions:
+  # the workflow-runs automatically get a GITHUB_TOKEN, here we set the permissions
+  actions: read # permission to interact with GitHub Actions itself, e.g., trigger workflows, cancel jobs
+  contents: write # permission to read/write repository contents, like cloning, committing, pushing, etc.
+  pull-requests: write # permission to modify pull requests
+  issues : read # permission to read issues
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
