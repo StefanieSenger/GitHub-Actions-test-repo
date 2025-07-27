@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
+  fail-fast: false
   matrix:
-    fail-fast: false
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
