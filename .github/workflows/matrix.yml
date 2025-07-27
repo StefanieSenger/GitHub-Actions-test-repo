@@ -6,9 +6,9 @@ on:
 
 jobs:
   matrix_job:
-    fail-fast: false
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: matrix_for_ubuntu
