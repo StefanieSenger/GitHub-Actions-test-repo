@@ -1,0 +1,27 @@
+name: using_matrix
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  matrix:
+    fail-fast: false
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - name: matrix_for_ubuntu
+            os: ubuntu-24.04
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu
+
+          - name: matrix_for_mac_os
+            os: macos-13
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_mac_os
+
+    steps:
+      - name: print os
+        run: echo ${{ matrix.os }}
+
+      - name: print environmental variable
+        run: echo $ENVIRONMENTAL_VARIABLE

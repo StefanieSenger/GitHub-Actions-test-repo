@@ -30,3 +30,6 @@ jobs:
         run: |
           conda create --yes --name conda_environment pytest
           conda run --name conda_environment pytest tests/test_file.py
+          
+        # this step fails with "CondaError: Run 'conda init' before 'conda activate'" ...
+        # seems I cannot fix it without learning more about conda first

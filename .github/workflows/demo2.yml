@@ -11,7 +11,7 @@ on:
   schedule:
     # at minute 30, at hours 5 and 17 (i.e., 5:30 AM and 5:30 PM),
     # * * *, every day of the month, every month, every day of the week
-    - cron:  '30 5,17 * * *'
+    # - cron:  '30 5,17 * * *' # commented out to not affect the environment
 
   workflow_call:
   # when another workflow calls this workflow, like this: 
@@ -67,4 +67,5 @@ jobs:
 
       - name: Install npm packages
         shell: zsh
-        run: npm install
+        run: npm install 
+        # this will fail because `npm` is not installed in the environment
