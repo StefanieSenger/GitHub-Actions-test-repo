@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  fail-fast: false
-  matrix:
+  matrix_job:
+    fail-fast: false
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -14,10 +14,12 @@ jobs:
           - name: matrix_for_ubuntu
             os: ubuntu-24.04
             ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu
-
           - name: matrix_for_mac_os
             os: macos-13
             ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_mac_os
+    
+    env:
+      ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
 
     steps:
       - name: print os
