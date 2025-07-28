@@ -10,12 +10,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - name: matrix_for_ubuntu
+            os: ubuntu-latest
             ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu
           - name: matrix_for_mac_os
+            os: macOS-latest
             ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_mac_os
+          - name: matrix_for_windows
+            os: windows-latest
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_windows
     
     env:
       ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
@@ -32,5 +36,4 @@ jobs:
         run: echo $ENVIRONMENTAL_VARIABLE
 
       - name: reprint os if windows
-        if: steps.test_id.outputs.os_name == 'Windows'
-        run: echo ${{ runner.os }}
+        run: echo ${{ steps.test_id.outputs.os_name }}
