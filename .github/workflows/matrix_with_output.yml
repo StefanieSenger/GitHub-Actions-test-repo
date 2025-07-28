@@ -1,0 +1,36 @@
+name: using_less_matrix
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  matrix_job:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - name: matrix_for_ubuntu
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu
+          - name: matrix_for_mac_os
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_mac_os
+    
+    env:
+      ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
+
+    steps:
+      - name: print os
+      # os_name is the defined output name
+        run: |
+          echo ${{ runner.os }}
+          echo "os_name=${{ runner.os }}" >> $GITHUB_OUTPUT
+        id: test_id
+
+      - name: print environmental variable
+        run: echo $ENVIRONMENTAL_VARIABLE
+
+      - name: reprint os if windows
+        if: steps.test_id.outputs.os_name == 'Windows'
+        run: echo ${{ runner.os }}
