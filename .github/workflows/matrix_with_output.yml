@@ -1,4 +1,4 @@
-name: using_matrix_with_output
+name: matrix_with_output
 
 on:
   push:

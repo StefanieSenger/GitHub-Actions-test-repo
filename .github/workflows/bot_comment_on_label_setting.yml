@@ -10,6 +10,8 @@ on:
 jobs:
   
   post_comment:
+    name: post_comment
+    runs-on: ubuntu-latest
     if: contains(github.event.pull_request.labels.*.name, 'question')
     permissions:
       pull-requests: write
