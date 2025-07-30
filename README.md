@@ -47,4 +47,4 @@ Actions: Pure Python
 wheels](https://learn.scientific-python.org/development/guides/gha-pure/),
 [https://learn.scientific-python.org/development/guides/gha-wheels/](https://learn.scientific-python.org/development/guides/gha-wheels/))
 on how to set up GitHub Action workflows. These are giving clear guidance, but are
-however more specific and don't explain the basics like what jobs or events are.
+however more specific and don't explain the basics like what jobs or events are!
