@@ -36,5 +36,5 @@ jobs:
         run: echo $ENVIRONMENTAL_VARIABLE
 
       - name: reprint os if windows
-        if: steps.test_id.outputs.os_name == 'Windows'
+        if: steps.test_id.os_name == 'Windows'
         run: echo ${{ runner.os }}

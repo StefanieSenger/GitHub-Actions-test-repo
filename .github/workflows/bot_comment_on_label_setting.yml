@@ -1,0 +1,20 @@
+name: comment on issue after label
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  
+  post_comment:
+    if: contains(github.event.pull_request.labels.*.name, 'question')
+    permissions:
+      pull-requests: write
+      #issues: write
+    
+    steps:
+      - name: verify if worked
+        run: echo label set
