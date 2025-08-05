@@ -39,6 +39,7 @@ jobs:
         with:
           create-symlink: true
           key: ${{ matrix.os }}
+          restore-keys: ${{ matrix.os }}
           job-summary: 'CCache Statistics'
 
       - name: set up conda
