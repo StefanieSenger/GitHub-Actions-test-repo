@@ -1,0 +1,65 @@
+name: matrix_with_output
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  matrix_job:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: matrix_for_ubuntu
+            os: ubuntu-latest
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu
+          - name: matrix_for_mac_os
+            os: macOS-latest
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_mac_os
+          - name: matrix_for_windows
+            os: windows-latest
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_windows
+          - name: matrix_for_ubuntu_2
+            os: ubuntu-latest
+            ENVIRONMENTAL_VARIABLE: this_is_our_environmental_variable_for_ubuntu_2
+    
+    env:
+      ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
+
+    steps:
+      - name: print os
+      # os_name is the defined output name
+        run: |
+          echo ${{ runner.os }}
+          echo "os_name=${{ runner.os }}" >> $GITHUB_OUTPUT
+        id: test_id
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          create-symlink: true
+          key: ${{ matrix.os }}
+
+      - name: set up conda
+        uses: conda-incubator/setup-miniconda@v3
+
+      - name: install environment and run test suite
+        run: |
+          conda create --yes --name conda_environment pytest
+          conda run --name conda_environment pytest tests/test_file.py
+
+      # - name: install python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.13.2'
+
+      - name: print python version
+        run: python --version
+
+      - name: print environmental variable
+        run: echo $ENVIRONMENTAL_VARIABLE
+
