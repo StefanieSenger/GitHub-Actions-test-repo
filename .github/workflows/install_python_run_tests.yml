@@ -15,6 +15,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # actually, it doesn't make sense to install python and then conda, since conda
+      # will come with its own python; but well... it's just a play repo
       - name: install python
         uses: actions/setup-python@v5
         with:

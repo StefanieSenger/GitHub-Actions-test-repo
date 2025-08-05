@@ -1,4 +1,4 @@
-name: matrix_with_output
+name: matrix_with_ccache
 
 on:
   push:
@@ -29,11 +29,7 @@ jobs:
 
     steps:
       - name: print os
-      # os_name is the defined output name
-        run: |
-          echo ${{ runner.os }}
-          echo "os_name=${{ runner.os }}" >> $GITHUB_OUTPUT
-        id: test_id
+        run: echo ${{ runner.os }}
 
       - name: Check out repository
         uses: actions/checkout@v4
@@ -43,19 +39,15 @@ jobs:
         with:
           create-symlink: true
           key: ${{ matrix.os }}
+          job-summary: 'CCache Statistics'
 
       - name: set up conda
         uses: conda-incubator/setup-miniconda@v3
 
       - name: install environment and run test suite
         run: |
-          conda create --yes --name conda_environment pytest
+          conda create --yes --name conda_environment pytest ccache
           conda run --name conda_environment pytest tests/test_file.py
-
-      # - name: install python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.13.2'
 
       - name: print python version
         run: python --version
