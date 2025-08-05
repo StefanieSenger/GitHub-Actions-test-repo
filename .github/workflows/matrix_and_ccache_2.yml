@@ -43,7 +43,7 @@ jobs:
           job-summary: 'CCache Statistics'
 
       - name: create cache for ccache
-        uses: actions/cache@v1.1.0
+        uses: actions/cache@v4
         id: ccache_id
         with:
           path: .ccache
