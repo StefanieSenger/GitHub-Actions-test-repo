@@ -5,9 +5,13 @@ name: create_artifact
 # the condition on which weekday it is and uploads both files as artifacts if they
 # exist. These files can then be downloaded in the actions tab.
 
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# to prevent it from running every time:
 on:
-  push:
-    branches: [ "main" ]
+  pull_request:
 
 jobs:
 

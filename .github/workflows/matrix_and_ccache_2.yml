@@ -42,13 +42,16 @@ jobs:
           restore-keys: ${{ matrix.os }}
           job-summary: 'CCache Statistics'
 
+      - name: create cache for ccache
+        uses: actions/cache@v1.1.0
+        id: ccache_id
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-ccache- # key is unique identifier used the access this cache
+          #restore-keys: ${{ runner.os }}-ccache- # fallback keys
+
       - name: set up conda
         uses: conda-incubator/setup-miniconda@v3
-
-      - name: install environment and run test suite
-        run: |
-          conda create --yes --name conda_environment pytest ccache
-          conda run --name conda_environment pytest tests/test_file.py
 
       - name: print python version
         run: python --version
@@ -56,3 +59,17 @@ jobs:
       - name: print environmental variable
         run: echo $ENVIRONMENTAL_VARIABLE
 
+      - name: compile if not ccached
+        if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
+        run: echo Compiling...
+
+      - name: Compile C code
+        run: gcc scr/hello.c -o hello
+
+      - name: show ccache Statistics
+        run: ccache --show-stats
+
+      - name: install environment and run test suite
+        run: |
+          conda create --yes --name conda_environment pytest ccache
+          conda run --name conda_environment pytest tests/test_file.py

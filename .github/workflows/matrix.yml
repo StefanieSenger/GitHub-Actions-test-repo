@@ -1,8 +1,12 @@
 name: using_matrix
 
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# to prevent it from running every time:
 on:
-  push:
-    branches: [ "main" ]
+  pull_request:
 
 jobs:
   matrix_job:
