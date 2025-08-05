@@ -34,7 +34,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # hopefully fixes windows issue:
+      # helps install ccache on windows:
       - name: Configure compiler for ccache
         shell: bash
         run: |
@@ -64,6 +64,15 @@ jobs:
 
       - name: Compile C code
         run: gcc scr/hello.c -o hello
+
+      - name: Install ccache (Linux/macOS)
+        if: runner.os != 'Windows' # too complicated on windows
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt update && sudo apt install -y ccache
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install ccache
+          fi
 
       - name: show ccache Statistics
         run: ccache --show-stats
