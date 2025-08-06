@@ -7,6 +7,9 @@ on:
     types:
       - labeled
 
+env:
+  CCACHE_DIR: ${{ github.workspace }}/ccache
+
 jobs:
   matrix_job:
     runs-on: ${{ matrix.os }}
@@ -48,9 +51,14 @@ jobs:
         uses: actions/cache@v4
         id: ccache_id
         with:
-          path: ~/.cache/ccache # path on mac is Library/Caches/ccache or use CCACHEDIR environment variable
+          path: ${{ github.workspace }}/ccache #~/.cache/ccache for ubuntu, on mac is Library/Caches/ccache or use CCACHEDIR environment variable
           # key is unique identifier used the access this cache
           key: ${{ runner.os }}-ccache- # probably need to use hashFiles to construct the key
+
+      - name: print runner workspace
+        run: |
+          echo ${{ runner.workspace }}
+          echo ${{ github.workspace }}
 
       - name: set up conda
         uses: conda-incubator/setup-miniconda@v3
@@ -58,7 +66,7 @@ jobs:
       - name: print environmental variable
         run: echo $ENVIRONMENTAL_VARIABLE
 
-      - name: print if cache was found
+      - name: print if cache was not found
         if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
         run: echo Cache was not found.
 
@@ -77,5 +85,5 @@ jobs:
 
       - name: install environment and run test suite
         run: |
-          conda create --yes --name conda_environment pytest ccache
+          conda create --yes --name conda_environment pytest
           conda run --name conda_environment pytest tests/test_file.py
