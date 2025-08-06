@@ -3,6 +3,9 @@ name: matrix_with_ccache
 on:
   push:
     branches: [ "main" ]
+  pull_request_target:
+    types:
+      - labeled
 
 jobs:
   matrix_job:
@@ -28,9 +31,9 @@ jobs:
       ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
 
     steps:
-    
+
       - name: Install ccache tool
-        if: runner.os != 'Windows' # too complicated on windows
+        if: runner.os != 'Windows' # more complicated on windows
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             sudo apt update && sudo apt install -y ccache
@@ -46,7 +49,8 @@ jobs:
         id: ccache_id
         with:
           path: ~/.ccache
-          key: ${{ runner.os }}-ccache- # key is unique identifier used the access this cache
+          # key is unique identifier used the access this cache
+          key: ${{ runner.os }}-ccache- # probably need to use hashFiles to construct the key
 
       - name: set up conda
         uses: conda-incubator/setup-miniconda@v3
@@ -58,14 +62,17 @@ jobs:
         if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
         run: echo Cache was not found.
 
-      - name: Compile C code
-        run: |
-          export CC="ccache gcc"
-          echo Compiling...
-          gcc scr/hello.c -o hello
+      - name: print path to ccache folder
+        run: ccache -p
 
-      - name: show ccache Statistics
-        if: runner.os != 'Windows' # too complicated on windows
+      - name: Compile C code
+        run: | # first line (export ...) is maybe not needed
+          export CC='ccache gcc'
+          echo Compiling...
+          ccache gcc -c scr/hello.c -o hello.o
+
+      - name: show ccache statistics
+        if: runner.os != 'Windows' # more complicated on windows
         run: ccache --show-stats
 
       - name: install environment and run test suite
