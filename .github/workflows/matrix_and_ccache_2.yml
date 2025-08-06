@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache@v4
         id: ccache_id
         with:
-          path: ~/.ccache
+          path: ~/.cache/ccache # path on mac is Library/Caches/ccache or use CCACHEDIR environment variable
           # key is unique identifier used the access this cache
           key: ${{ runner.os }}-ccache- # probably need to use hashFiles to construct the key
 
