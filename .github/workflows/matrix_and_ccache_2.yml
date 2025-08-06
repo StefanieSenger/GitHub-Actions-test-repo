@@ -28,44 +28,8 @@ jobs:
       ENVIRONMENTAL_VARIABLE: ${{ matrix.ENVIRONMENTAL_VARIABLE }}
 
     steps:
-      - name: print os
-        run: echo ${{ runner.os }}
-
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      # helps install ccache on windows:
-      - name: Configure compiler for ccache
-        shell: bash
-        run: |
-          export CC="ccache gcc"
-          export CXX="ccache g++"
-
-      - name: create cache for ccache
-        uses: actions/cache@v4
-        id: ccache_id
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-ccache- # key is unique identifier used the access this cache
-          #restore-keys: ${{ runner.os }}-ccache- # fallback keys
-
-      - name: set up conda
-        uses: conda-incubator/setup-miniconda@v3
-
-      - name: print python version
-        run: python --version
-
-      - name: print environmental variable
-        run: echo $ENVIRONMENTAL_VARIABLE
-
-      - name: compile if not ccached
-        if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
-        run: echo Compiling...
-
-      - name: Compile C code
-        run: gcc scr/hello.c -o hello
-
-      - name: Install ccache (Linux/macOS)
+    
+      - name: Install ccache tool
         if: runner.os != 'Windows' # too complicated on windows
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -74,7 +38,34 @@ jobs:
             brew install ccache
           fi
 
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: create cache for ccache
+        uses: actions/cache@v4
+        id: ccache_id
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache- # key is unique identifier used the access this cache
+
+      - name: set up conda
+        uses: conda-incubator/setup-miniconda@v3
+
+      - name: print environmental variable
+        run: echo $ENVIRONMENTAL_VARIABLE
+
+      - name: print if cache was found
+        if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
+        run: echo Cache was not found.
+
+      - name: Compile C code
+        run: |
+          export CC="ccache gcc"
+          echo Compiling...
+          gcc scr/hello.c -o hello
+
       - name: show ccache Statistics
+        if: runner.os != 'Windows' # too complicated on windows
         run: ccache --show-stats
 
       - name: install environment and run test suite
