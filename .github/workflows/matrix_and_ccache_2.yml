@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v4
         id: ccache_id
         with:
-          path: ${{ github.workspace }}/ccache #~/.cache/ccache for ubuntu, on mac is Library/Caches/ccache or use CCACHEDIR environment variable
+          path: ${{ github.workspace }}/ccache
           # key is unique identifier used the access this cache
           key: ${{ runner.os }}-ccache- # probably need to use hashFiles to construct the key
 
@@ -60,13 +60,17 @@ jobs:
           echo ${{ runner.workspace }}
           echo ${{ github.workspace }}
 
+      - name: Set compiler ID
+        id: get-compiler
+        run: echo "compiler=$(cc --version | head -n1 | tr ' ' '_' | cut -c1-50)" >> $GITHUB_OUTPUT
+
       - name: set up conda
         uses: conda-incubator/setup-miniconda@v3
 
       - name: print environmental variable
         run: echo $ENVIRONMENTAL_VARIABLE
 
-      - name: print if cache was not found
+      - name: print when cache was not found
         if: ${{ steps.ccache_id.outputs.cache-hit != 'true' }}
         run: echo Cache was not found.
 
@@ -74,9 +78,9 @@ jobs:
         run: ccache -p
 
       - name: Compile C code
-        run: | # first line (export ...) is maybe not needed
-          export CC='ccache gcc'
+        run: |
           echo Compiling...
+          ccache -z
           ccache gcc -c scr/hello.c -o hello.o
 
       - name: show ccache statistics
