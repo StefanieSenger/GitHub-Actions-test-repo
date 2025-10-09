@@ -4,6 +4,7 @@ name: autoclose
 
 permissions:
   contents: read
+  pull-requests: write
 
 on:
   pull_request_target:
@@ -21,8 +22,6 @@ jobs:
     name: post_comment
     if: github.event.label.name == 'autoclose'
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     
     steps:
 
