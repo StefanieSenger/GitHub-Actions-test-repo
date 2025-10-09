@@ -1,0 +1,56 @@
+name: autoclose
+# Autoclose labeled PR after 2 weeks, post comment to explain the process and how to
+# prevent the autoclose.
+
+permissions:
+  contents: read
+
+on:
+  pull_request_target:
+    types:
+      - labeled
+
+jobs:
+  
+  post_comment:
+    name: post_comment
+    if: github.event.label.name == 'autoclose'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    
+    steps:
+
+      - name: comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/StefanieSenger/GitHub-Actions-test-repo/issues/$PULL_REQUEST_NUMBER/comments \
+          -f 'body=The `autoclose` label was set. etc etc ...'
+
+  close_pull_request:
+    # close pull request immediately # delay to be implemented
+    name: close_pull_request
+    if: github.event.label.name == 'autoclose'
+    needs: post_comment
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: close PR
+        run: gh pr close "$PULL_REQUEST_NUMBER" --comment "$BODY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #GH_REPO: ${{ github.repository }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          BODY: |
+            Thank you for working on this pull request and for your interest in contributing to scikit-learn. However, we cannot accept your contribution as this pull request doesn't meet the development standards and puts an unproportional burden on reviewers.
+            
+            Following our autoclose policy, we are closing this PR after two weeks time for improvements. 
+            
+            This is an automated action. We apologise for the inconvenience. If you think your PR has been closed by mistake, please contact us and we can re-consider.

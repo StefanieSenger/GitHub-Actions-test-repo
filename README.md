@@ -8,12 +8,12 @@ Place where I play with GitHub Actions.
 - link to [Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions)
 
 #### Tutorials
-First, I had followed this FreeCodeCamp tutorial: [Learn to Use GitHub Actions: a
+To get started, I had followed this FreeCodeCamp tutorial: [Learn to Use GitHub Actions: a
 Step-by-Step
 Guide](https://www.freecodecamp.org/news/learn-to-use-github-actions-step-by-step-guide/).
-I've found a few mistakes in it, that I point put in case you're new to that, too:
+I've found a few errors in it, that I point out in case you're new to that, too:
 - the folder where to define actions needs to be `.github/workflows`, not
-  `.github/workflow`
+  `.github/workflow` (as written in the tutorial)
 - the second demo (`demo2.yml` in this repo) seems to have several problems and cannot
   be run (`permissions` are listed as an event, which they are not, and having `uses`
   and `run` in the same step below is wrong as well, as you can have either one of
