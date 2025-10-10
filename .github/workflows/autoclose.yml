@@ -1,4 +1,4 @@
-name: schedule autoclose
+name: autoclose schedule
 # Autoclose labeled PR after 2 weeks
 
 permissions:
@@ -23,5 +23,15 @@ jobs:
 
       - name: detect labeled PRs
         run: |
-          gh issue list --repo "$GH_REPO" --label autoclose --state open --json number,title,body
-          echo number,title,body
+          PR_NUMBERS=$(gh pr list \
+            --repo "$GH_REPO" \
+            --label autoclose \
+            --state open \
+            --json number \
+            --jq '.[].number' | tr '\n' ' ')
+          echo "PR_NUMBERS=$PR_NUMBERS" >> $GITHUB_ENV
+
+      - name: echo labeled PR numbers
+        run: echo "PR numbers $PR_NUMBERS"
+        env:
+          PR_NUMBERS: ${{ env.PR_NUMBERS }}

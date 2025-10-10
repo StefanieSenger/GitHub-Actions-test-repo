@@ -1,4 +1,4 @@
-name: comment autoclose
+name: autoclose comment
 # Post comment on PRs labeled with "autoclose" to explain the process and how to
 # prevent the autoclose.
 
