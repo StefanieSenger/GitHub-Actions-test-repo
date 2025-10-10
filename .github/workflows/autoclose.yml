@@ -1,54 +1,28 @@
-name: autoclose
-# Autoclose labeled PR after 2 weeks, post comment to explain the process and how to
-# prevent the autoclose.
+name: schedule autoclose
+# Autoclose labeled PR after 2 weeks
 
 permissions:
   contents: read
   pull-requests: write
 
 on:
-  pull_request_target:
-    types:
-      - labeled
+  schedule:
+    #- cron: '0 2 * * *' # runs daily at 02:00 UTC
+    - cron: '*/2 * * * *' # runs every 2 minutes
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_REPO: ${{ github.repository }}
-  PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
-  
-  post_comment:
-    name: post_comment
-    if: github.event.label.name == 'autoclose'
+
+  autoclose:
+    name: autoclose labeled PRs on schedule
     runs-on: ubuntu-latest
-    
     steps:
 
-      - name: comment
+      - name: detect labeled PRs
         run: |
-          gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/$GH_REPO/issues/$PULL_REQUEST_NUMBER/comments \
-          -f 'body=The `autoclose` label was set. etc etc ...'
+          gh issue list --repo "$GH_REPO" --label autoclose --state open --json number,title,body
+          echo number,title,body
 
-  close_pull_request:
-    # close pull request immediately # delay to be implemented
-    name: close_pull_request
-    if: github.event.label.name == 'autoclose'
-    needs: post_comment
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: close PR
-        run: gh pr close "$PULL_REQUEST_NUMBER" --repo "$GH_REPO" --comment "$BODY"
-        env:
-          BODY: |
-            Thank you for working on this pull request and for your interest in contributing to scikit-learn. However, we cannot accept your contribution as this pull request doesn't meet the development standards and puts an unproportional burden on reviewers.
-            
-            Following our autoclose policy, we are closing this PR after two weeks time for improvements. 
-            
-            This is an automated action. We apologise for the inconvenience. If you think your PR has been closed by mistake, please contact us and we can re-consider.
