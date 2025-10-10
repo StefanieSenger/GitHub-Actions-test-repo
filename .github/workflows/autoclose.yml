@@ -8,7 +8,7 @@ permissions:
 on:
   schedule:
     #- cron: '0 2 * * *' # runs daily at 02:00 UTC
-    - cron: '*/2 * * * *' # runs every 2 minutes
+    - cron: '* * * * *' # runs every minute / for debug
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,4 +25,3 @@ jobs:
         run: |
           gh issue list --repo "$GH_REPO" --label autoclose --state open --json number,title,body
           echo number,title,body
-
