@@ -8,7 +8,8 @@ permissions:
 on:
   schedule:
     #- cron: '0 2 * * *' # runs daily at 02:00 UTC
-    - cron: '* * * * *' # runs every minute / for debugging
+    #- cron: '* * * * *' # runs every minute / for debugging
+  workflow_dispatch:  # for debugging
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,10 +78,12 @@ jobs:
       # for debugging
       - name: echo labeled PR numbers
         run: echo "PR numbers $PULL_REQUESTS"
+        env:
+          PULL_REQUESTS: ${{ env.PULL_REQUESTS }}
 
       - name: close labeled PRs and post comment
-        if: env.PULL_REQUESTS != '0' # 0 is the output if no PRs were found that were labeled more than 14 days ago
-        # if: env.PULL_REQUESTS != ''
+        #if: env.PULL_REQUESTS != '0' # 0 is the output if no PRs were found that were labeled more than 14 days ago
+        if: env.PULL_REQUESTS != ''
         run: |
           for PR in $PULL_REQUESTS; do
             echo "Closing PR #$PR"
