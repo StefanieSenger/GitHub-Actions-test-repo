@@ -21,28 +21,50 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: detect labeled PRs
-        run: |
-          PR_NUMBERS=$(gh pr list \
-            --repo "$GH_REPO" \
-            --label autoclose \
-            --state open \
-            --json number \
-            --jq '.[].number' | tr '\n' ' ')
-          echo "PR_NUMBERS=$PR_NUMBERS" >> $GITHUB_ENV
+      - name: detect labeled PRs and filter for older than 14 days
+        # run: |
+        #   PR_NUMBERS=$(gh pr list \
+        #     --repo "$GH_REPO" \
+        #     --label autoclose \
+        #     --state open \
+        #     --json number \
+        #     --jq '.[].number' | tr '\n' ' ')
+        #   echo "PR_NUMBERS=$PR_NUMBERS" >> $GITHUB_ENV
 
+        run: |
+          CUTOFF_DAYS=14
+          CUTOFF_SECONDS=$((CUTOFF_DAYS * 86400))
+          NOW=$(date +%s)
+          PULL_REQUESTS=""
+
+          for PR in $(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number'); do
+            TIMESTAMP=$(gh api repos/$GH_REPO/issues/$PR/events --jq '
+              map(select(.event == "labeled" and .label.name == "autoclose")) |
+              last?.created_at' | tr -d '"')
+
+            if [ -n "$TIMESTAMP" ];
+              LABEL_TIME=$(date -d "$TIMESTAMP" +%s)
+              AGE=$(( (NOW - LABEL_TIME) / 86400 ))
+              if [ $AGE -gt $CUTOFF_DAYS ]; then
+                PULL_REQUESTS="$PULL_REQUESTS $PR"
+              fi
+            fi
+          done
+
+          echo "PULL_REQUESTS=$PULL_REQUESTS" >> $GITHUB_ENV
+          
       # for debugging
       - name: echo labeled PR numbers
-        run: echo "PR numbers $PR_NUMBERS"
+        run: echo "PR numbers $PULL_REQUESTS"
         env:
-          PR_NUMBERS: ${{ env.PR_NUMBERS }}
+          PULL_REQUESTS: ${{ env.PULL_REQUESTS }}
 
       - name: close labeled PRs and post comment
-        if: env.PR_NUMBERS != '0' # 0 is the output for no PRs found
+        if: env.PULL_REQUESTS != '0' # 0 is the output if no PRs were found that were labeled more than 14 days ago
         run: |
-          for PULL_REQUEST_NUMBER in $PR_NUMBERS; do
-            echo "Closing PR #$PULL_REQUEST_NUMBER"
-            gh pr close "$PULL_REQUEST_NUMBER" \
+          for PR in $PULL_REQUESTS; do
+            echo "Closing PR #$PR"
+            gh pr close "$PR" \
               --repo "$GH_REPO" \
               --comment "$BODY"
           done

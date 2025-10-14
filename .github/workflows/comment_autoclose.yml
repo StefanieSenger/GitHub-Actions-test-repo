@@ -34,21 +34,22 @@ jobs:
           /repos/$GH_REPO/issues/$PULL_REQUEST_NUMBER/comments \
           -f 'body=The `autoclose` label was set. etc etc ...'
 
-  close_pull_request:
-    # close pull request immediately # delay to be implemented
-    name: close_pull_request
-    if: github.event.label.name == 'autoclose'
-    needs: post_comment
-    runs-on: ubuntu-latest
+  # close_pull_request:
+  #   # close pull request immediately; delay via cron scheduling in autoclose.yml
+  #   name: close_pull_request
+  #   if: github.event.label.name == 'autoclose'
+  #   needs: post_comment
+  #   runs-on: ubuntu-latest
 
-    steps:
+  #   steps:
 
-      - name: close PR
-        run: gh pr close "$PULL_REQUEST_NUMBER" --repo "$GH_REPO" --comment "$BODY"
-        env:
-          BODY: |
-            Thank you for working on this pull request and for your interest in contributing to scikit-learn. However, we cannot accept your contribution as this pull request doesn't meet the development standards and puts an unproportional burden on reviewers.
+  #     - name: close PR
+  #       run: gh pr close "$PULL_REQUEST_NUMBER" --repo "$GH_REPO" --comment "$BODY"
+  #       env:
+  #         BODY: |
+  #           Thank you for working on this pull request and for your interest in contributing to scikit-learn. However, we cannot accept your contribution as this pull request doesn't meet the development standards and puts an unproportional burden on reviewers.
             
-            Following our autoclose policy, we are closing this PR after two weeks time for improvements. 
+  #           Following our autoclose policy, we are closing this PR after two weeks time for improvements. 
             
-            We apologise for the inconvenience. If you think your PR has been closed by mistake, please contact a maintainer.
+  #           We apologise for the inconvenience. If you think your PR has been closed by mistake, please contact a maintainer.
+
