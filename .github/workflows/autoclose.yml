@@ -42,7 +42,7 @@ jobs:
               map(select(.event == "labeled" and .label.name == "autoclose")) |
               last?.created_at' | tr -d '"')
 
-            if [ -n "$TIMESTAMP" ];
+            if [ -n "$TIMESTAMP" ]; then
               LABEL_TIME=$(date -d "$TIMESTAMP" +%s)
               AGE=$(( (NOW - LABEL_TIME) / 86400 ))
               if [ $AGE -gt $CUTOFF_DAYS ]; then
