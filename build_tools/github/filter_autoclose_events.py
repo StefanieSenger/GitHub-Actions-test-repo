@@ -1,0 +1,70 @@
+from datetime import datetime, timezone
+import requests
+import os
+
+CUTOFF_DAYS=14
+
+def get_headers(GITHUB_TOKEN): # can be imported from another scikit-learn file
+    """Get the headers for the GitHub API."""
+    return {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+def _get_paginated_results(url, headers):
+    results = []
+    page = 1
+    while True:
+        paged_url = f"{url}?per_page=100&page={page}"
+        response = requests.get(paged_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        if not data:
+            break
+        results.extend(data)
+        page += 1
+    return results
+
+def get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS):
+    # get "autoclose" labeled PRs that are older than 14 days
+    all_labeled_prs = [int(x) for x in ALL_LABELED_PRS.split()]
+    now = datetime.now(timezone.utc)
+    pull_requests_to_autoclose = []
+
+    for pr in all_labeled_prs:
+        timestamp_label_last_set = None
+        url = f"https://api.github.com/repos/StefanieSenger/{GH_REPO}/issues/{pr}/events"
+        events = _get_paginated_results(url, get_headers(GITHUB_TOKEN))
+        for event in events:
+            if event['event'] == 'labeled' and event['label']['name'] == 'autoclose':
+                timestamp_label_last_set = event['created_at']
+                timestamp_label_last_set = datetime.strptime(timestamp_label_last_set, "%Y-%m-%dT%H:%M:%SZ")
+                timestamp_label_last_set = timestamp_label_last_set.replace(tzinfo=timezone.utc)
+        if timestamp_label_last_set is None:
+            # we should filter only through PRs that have an autoclose label set, so a
+            # failure to find that key would mean something is off and the action should
+            # fail:
+            raise KeyError(f"Could not find 'autoclose' label in pre-filtered PRs.")
+        if (now - timestamp_label_last_set).days > 14:
+            pull_requests_to_autoclose.append(pr)
+
+    return ','.join([str(x) for x in pull_requests_to_autoclose])
+
+
+if __name__ == "__main__":
+    GH_REPO = os.getenv("GH_REPO", "")
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
+    ALL_LABELED_PRS = os.getenv("ALL_LABELED_PRS", "")
+
+    # for debugging
+    # GH_REPO = "GitHub-Actions-test-repo"
+    # GITHUB_TOKEN = "..." # manually insert for debugging
+    # ALL_LABELED_PRS = "1"
+
+    pull_requests_to_autoclose = get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS)
+
+    # this should append a new environmental variable to the GITHUB_ENV, even though
+    # the github action runs in a parent process ... (let's see if it works...):
+    with open(os.getenv("GITHUB_ENV"), "a") as f:
+        f.write(f"PULL_REQUESTS={pull_requests_to_autoclose}\n")

@@ -24,24 +24,13 @@ jobs:
 
       - name: detect labeled PRs and filter for older than 14 days
         # run: |
-        #   PR_NUMBERS=$(gh pr list \
-        #     --repo "$GH_REPO" \
-        #     --label autoclose \
-        #     --state open \
-        #     --json number \
-        #     --jq '.[].number' | tr '\n' ' ')
-        #   echo "PR_NUMBERS=$PR_NUMBERS" >> $GITHUB_ENV
-
-        # run: |
         #   CUTOFF_DAYS=14
         #   NOW=$(date +%s)
         #   PULL_REQUESTS=""
-
         #   for PR in $(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number'); do
         #     TIMESTAMP=$(gh api repos/$GH_REPO/issues/$PR/events --jq '
         #       map(select(.event == "labeled" and .label.name == "autoclose")) |
         #       last?.created_at' | tr -d '"')
-
         #     if [ -n "$TIMESTAMP" ]; then
         #       LABEL_TIME=$(date -d "$TIMESTAMP" +%s)
         #       AGE=$(( (NOW - LABEL_TIME) / 86400 ))
@@ -50,34 +39,37 @@ jobs:
         #       fi
         #     fi
         #   done
-
         #   echo "PULL_REQUESTS=$PULL_REQUESTS" >> $GITHUB_ENV
 
-        # for debug
+        # for debug: checks age is older than 14 seconds instead of days
+        # run: |
+        #   CUTOFF_DAYS=14
+        #   NOW=$(date +%s)
+        #   PULL_REQUESTS=""
+        #   for PR in $(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number'); do
+        #     TIMESTAMP=$(gh api repos/$GH_REPO/issues/$PR/events --jq '
+        #       map(select(.event == "labeled" and .label.name == "autoclose")) |
+        #       last?.created_at' | tr -d '"')
+        #     if [ -n "$TIMESTAMP" ]; then
+        #       LABEL_TIME=$(date -d "$TIMESTAMP" +%s)
+        #       AGE=$(( (NOW - LABEL_TIME) ))
+        #       if [ $AGE -gt $CUTOFF_DAYS ]; then
+        #         PULL_REQUESTS="$PULL_REQUESTS $PR"
+        #       fi
+        #     fi
+        #   done
+        #   echo "PULL_REQUESTS=$PULL_REQUESTS" >> $GITHUB_ENV
+
+        # python code instead of shell script
         run: |
-          CUTOFF_DAYS=14
-          NOW=$(date +%s)
-          PULL_REQUESTS=""
+          set -e
+          ALL_LABELED_PRS=$(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number')
+          export ALL_LABELED_PRS="$ALL_LABELED_PRS"
+          python build_tools/github/detect_autoclose_label.py
 
-          for PR in $(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number'); do
-            TIMESTAMP=$(gh api repos/$GH_REPO/issues/$PR/events --jq '
-              map(select(.event == "labeled" and .label.name == "autoclose")) |
-              last?.created_at' | tr -d '"')
-
-            if [ -n "$TIMESTAMP" ]; then
-              LABEL_TIME=$(date -d "$TIMESTAMP" +%s)
-              AGE=$(( (NOW - LABEL_TIME) ))
-              if [ $AGE -gt $CUTOFF_DAYS ]; then
-                PULL_REQUESTS="$PULL_REQUESTS $PR"
-              fi
-            fi
-          done
-
-          echo "PULL_REQUESTS=$PULL_REQUESTS" >> $GITHUB_ENV
-          
       # for debugging
       - name: echo labeled PR numbers
-        run: echo "PR numbers $PULL_REQUESTS"
+        run: echo "Found PRs to autoclose: $PULL_REQUESTS"
         env:
           PULL_REQUESTS: ${{ env.PULL_REQUESTS }}
 
