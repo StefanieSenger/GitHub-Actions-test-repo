@@ -69,7 +69,7 @@ jobs:
 
       # for debugging
       - name: echo labeled PR numbers
-        run: echo "Found PRs to autoclose: $PULL_REQUESTS"
+        run: echo "Found PRs to autoclose $PULL_REQUESTS"
         env:
           PULL_REQUESTS: ${{ env.PULL_REQUESTS }}
 
