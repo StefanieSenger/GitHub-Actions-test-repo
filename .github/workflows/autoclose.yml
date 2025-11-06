@@ -65,7 +65,7 @@ jobs:
           set -e
           ALL_LABELED_PRS=$(gh pr list --repo "$GH_REPO" --label autoclose --state open --json number --jq '.[].number')
           export ALL_LABELED_PRS="$ALL_LABELED_PRS"
-          python build_tools/github/detect_autoclose_label.py
+          python build_tools/github/filter_autoclose_events.py
 
       # for debugging
       - name: echo labeled PR numbers
