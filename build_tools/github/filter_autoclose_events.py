@@ -34,7 +34,7 @@ def get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS):
 
     for pr in all_labeled_prs:
         timestamp_label_last_set = None
-        url = f"https://api.github.com/repos/StefanieSenger/{GH_REPO}/issues/{pr}/events"
+        url = f"https://api.github.com/repos/{GH_REPO}/issues/{pr}/events"
         events = _get_paginated_results(url, get_headers(GITHUB_TOKEN))
         for event in events:
             if event['event'] == 'labeled' and event['label']['name'] == 'autoclose':
@@ -58,9 +58,9 @@ if __name__ == "__main__":
     ALL_LABELED_PRS = os.getenv("ALL_LABELED_PRS", "")
 
     # for debugging
-    # GH_REPO = "GitHub-Actions-test-repo"
+    #GH_REPO = "StefanieSenger/GitHub-Actions-test-repo"
     # GITHUB_TOKEN = "..." # manually insert for debugging
-    # ALL_LABELED_PRS = "1"
+    #ALL_LABELED_PRS = "1"
 
     pull_requests_to_autoclose = get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS)
 
