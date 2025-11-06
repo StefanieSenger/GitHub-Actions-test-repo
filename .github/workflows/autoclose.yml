@@ -22,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      # need to check out repository to find path
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: detect labeled PRs and filter for older than 14 days
         # run: |
         #   CUTOFF_DAYS=14
