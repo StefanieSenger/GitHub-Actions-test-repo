@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import requests
 import os
+import subprocess
 
 CUTOFF_DAYS=14
 
@@ -11,6 +12,7 @@ def get_headers(GITHUB_TOKEN): # can be imported from another scikit-learn file
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+
 
 def _get_paginated_results(url, headers):
     results = []
@@ -26,9 +28,12 @@ def _get_paginated_results(url, headers):
         page += 1
     return results
 
-def get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS):
+
+def get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN):
     # get "autoclose" labeled PRs that are older than 14 days
-    all_labeled_prs = [int(x) for x in ALL_LABELED_PRS.split()]
+    command = ['gh', 'pr', 'list', '--repo', GH_REPO, '--label', 'autoclose', '--state', 'open', '--json', 'number', '--jq', '.[].number']
+    all_labeled_prs = subprocess.check_output(command, text=True)
+    all_labeled_prs = [int(x) for x in all_labeled_prs.split()]
     now = datetime.now(timezone.utc)
     pull_requests_to_autoclose = []
 
@@ -55,16 +60,15 @@ def get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS):
 if __name__ == "__main__":
     GH_REPO = os.getenv("GH_REPO", "")
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-    ALL_LABELED_PRS = os.getenv("ALL_LABELED_PRS", "")
 
     # for debugging
-    #GH_REPO = "StefanieSenger/GitHub-Actions-test-repo"
+    # GH_REPO = "StefanieSenger/GitHub-Actions-test-repo"
     # GITHUB_TOKEN = "..." # manually insert for debugging
-    #ALL_LABELED_PRS = "1"
 
-    pull_requests_to_autoclose = get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN, ALL_LABELED_PRS)
+    pull_requests_to_autoclose = get_pull_requests_to_autoclose(GH_REPO, GITHUB_TOKEN)
+    print(pull_requests_to_autoclose)
 
-    # this should append a new environmental variable to the GITHUB_ENV, even though
-    # the github action runs in a parent process ... (let's see if it works...):
+    # this appends a new environmental variable to the GITHUB_ENV, even though
+    # the github action runs in a parent process ...:
     with open(os.getenv("GITHUB_ENV"), "a") as f:
-        f.write(f"PULL_REQUESTS={pull_requests_to_autoclose}\n")
+       f.write(f"PULL_REQUESTS={pull_requests_to_autoclose}\n")
