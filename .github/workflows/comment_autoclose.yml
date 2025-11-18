@@ -34,7 +34,7 @@ jobs:
           /repos/$GH_REPO/issues/$PULL_REQUEST_NUMBER/comments \
           -f "body=$BODY"
         env:
-          BODY: |
+          BODY: >
             ⏰ This pull request might be automatically closed in two weeks from now.
 
             Thank you for your contribution to scikit-learn and for the effort you have put into this PR. This pull request does not yet meet the quality and clarity needed for an effective review. Reviewing time is limited, and PRs \
