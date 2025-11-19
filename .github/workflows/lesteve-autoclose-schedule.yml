@@ -1,4 +1,4 @@
-name: autoclose schedule
+name: lesteve autoclose schedule
 # Autoclose labeled PR after 2 weeks.
 
 permissions:

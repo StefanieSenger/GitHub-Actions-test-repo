@@ -20,6 +20,7 @@ def get_labeled_last_time(pr, label):
 
 gh_repo = "StefanieSenger/GitHub-Actions-test-repo"
 github_token = os.getenv("GITHUB_TOKEN")
+print(f"{github_token=}")
 
 gh = Github(github_token)
 repo = gh.get_repo(gh_repo)
