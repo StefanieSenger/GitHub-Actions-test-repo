@@ -49,5 +49,5 @@ message = (
 
 for pr in prs:
     print(f"Closing PR #{pr.number} with comment")
-    pr.add_comment(message)
+    pr.create_comment(message)
     pr.edit(state='closed')
