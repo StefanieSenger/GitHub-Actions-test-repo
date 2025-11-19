@@ -29,7 +29,7 @@ now = datetime.now(timezone.utc)
 label = "autoclose"
 prs = [
     each
-    for each in repo.get_issues(labels=[label], state="opened")
+    for each in repo.get_issues(labels=[label])
     if each.pull_request is not None
     and (now - get_labeled_last_time(each, label)).days > CUTOFF_DAYS
 ]
