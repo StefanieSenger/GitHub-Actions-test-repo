@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from github import Github
 
-CUTOFF_DAYS = 0
+CUTOFF_DAYS = -1
 
 def get_labeled_last_time(pr, label):
     labeled_time = None
